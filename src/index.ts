@@ -1,26 +1,26 @@
-import * as dotenv from 'dotenv'
-import express from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
+import * as dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
 
-import validateEnv from '@utils/validateEnv'
+import validateEnv from '@utils/validateEnv';
 
-dotenv.config()
+dotenv.config();
 
-validateEnv()
+validateEnv();
 
-const port = process.env.PORT
+const port = process.env.PORT;
 
-const app = express()
+const app = express();
 
-app.use(helmet())
-app.use(cors())
-app.use(express.json())
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  res.send('Hello World!');
+});
 
 app.listen(port, () => {
-  console.log(`Listening on port ${port}`)
-})
+  console.log(`Listening on port ${port}`);
+});

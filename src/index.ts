@@ -3,7 +3,11 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 
+import validateEnv from '@utils/validateEnv'
+
 dotenv.config()
+
+validateEnv()
 
 const port = process.env.PORT
 

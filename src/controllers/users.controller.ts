@@ -1,65 +1,84 @@
 import { Request, Response } from 'express'
 import UsersService from '@/services/users.service'
 import { User } from '@prisma/client'
+import { CreateUser, UpdateUser } from '@/validations/users.validation'
 
 class UsersController {
   public usersService = new UsersService()
 
-  public getUsers = async (req: Request, res: Response): Promise<void> => {
+  public getUsers = async (_: Request, res: Response) => {
     try {
-      const users: User[] = await this.usersService.getUsers()
+      const users = await this.usersService.getUsers()
 
-      res.status(200).json({ users })
+      res.status(200).json({ success: true, data: users })
     } catch (e) {
-      res.status(500).json({ error: e.message })
+      return res
+        .status(500)
+        .json({ success: false, message: 'An error occurred' })
     }
   }
 
-  public getUserById = async (req: Request, res: Response): Promise<void> => {
+  public getUserById = async (
+    req: Request<{ id: string }>,
+    res: Response<ApiResponse<User | null>>
+  ) => {
+    const { id } = req.params
+    try {
+      const user = await this.usersService.getUserById(id)
+
+      res.status(200).json({ success: true, data: user })
+    } catch (e) {
+      return res
+        .status(500)
+        .json({ success: false, message: 'An error occurred' })
+    }
+  }
+
+  public createUser = async (
+    req: Request<{ id: string }, any, CreateUser>,
+    res: Response<ApiResponse<User>>
+  ) => {
+    try {
+      const user: User = await this.usersService.createUser(req.body)
+
+      return res.status(201).json({ success: true, data: user })
+    } catch (e) {
+      return res
+        .status(500)
+        .json({ success: false, message: 'User creation failed' })
+    }
+  }
+
+  public updateUser = async (
+    req: Request<{ id: string }, any, UpdateUser>,
+    res: Response<ApiResponse<User>>
+  ) => {
+    const { body, params } = req
+
+    try {
+      const updatedUser = await this.usersService.updateUser(params.id, body)
+
+      res.status(200).json({ success: true, data: updatedUser })
+    } catch (e) {
+      return res
+        .status(500)
+        .json({ success: false, message: 'User update failed' })
+    }
+  }
+
+  public deleteUser = async (
+    req: Request<{ id: string }>,
+    res: Response<ApiResponse>
+  ) => {
     try {
       const { id } = req.params
-      const user: User | null = await this.usersService.getUserById(id)
+      await this.usersService.deleteUser(id)
 
-      res.status(200).json({ user })
+      res.status(200).json({ success: true })
     } catch (e) {
-      res.status(500).json({ error: e.message })
-    }
-  }
-
-  public createUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const user: User = req.body
-      const newUser: User = await this.usersService.createUser(user)
-
-      res.status(201).json({ user: newUser })
-    } catch (e) {
-      res.status(500).json({ error: e.message })
-    }
-  }
-
-  public updateUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params
-      const userUpdate: User = req.body
-      const updatedUser: User = await this.usersService.updateUser(
-        id,
-        userUpdate
-      )
-
-      res.status(200).json({ user: updatedUser })
-    } catch (e) {
-      res.status(500).json({ error: e.message })
-    }
-  }
-
-  public deleteUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params
-      const deletedUser: User = await this.usersService.deleteUser(id)
-
-      res.status(200).json({ user: deletedUser })
-    } catch (e) {
-      res.status(500).json({ error: e.message })
+      return res
+        .status(500)
+        .json({ success: false, message: 'User deletion failed' })
     }
   }
 }

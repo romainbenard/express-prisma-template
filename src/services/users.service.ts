@@ -1,3 +1,4 @@
+import { CreateUser } from '@/validations/users.validation'
 import { PrismaClient, User } from '@prisma/client'
 
 class UsersService {
@@ -7,7 +8,7 @@ class UsersService {
     try {
       return await this.users.findMany()
     } catch (e) {
-      throw new Error(e)
+      throw new Error(e as string)
     }
   }
 
@@ -19,21 +20,24 @@ class UsersService {
         },
       })
     } catch (e) {
-      throw new Error(e)
+      throw new Error(e as string)
     }
   }
 
-  public createUser = async (data: User): Promise<User> => {
+  public createUser = async (data: CreateUser): Promise<User> => {
     try {
       return await this.users.create({
         data,
       })
     } catch (e) {
-      throw new Error(e)
+      throw new Error(e as string)
     }
   }
 
-  public updateUser = async (id: string, data: User): Promise<User> => {
+  public updateUser = async (
+    id: string,
+    data: Partial<User>
+  ): Promise<User> => {
     try {
       return await this.users.update({
         where: {
@@ -42,7 +46,7 @@ class UsersService {
         data,
       })
     } catch (e) {
-      throw new Error(e)
+      throw new Error(e as string)
     }
   }
 
@@ -54,7 +58,7 @@ class UsersService {
         },
       })
     } catch (e) {
-      throw new Error(e)
+      throw new Error(e as string)
     }
   }
 }

@@ -3,7 +3,6 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import validateEnv from '@utils/validateEnv'
-import router from './routers/route'
 import usersRouter from './routers/user.routes'
 
 dotenv.config()
@@ -16,7 +15,6 @@ app.use(helmet())
 app.use(cors())
 app.use(express.json())
 
-app.use('/', router)
 app.use('/users', usersRouter)
 
 app.use('*', (_, res) => {

@@ -35,6 +35,6 @@
     },
     "strict": true
   },
-  "include": ["src/**/*.ts", "src/**/*.json", ".env"],
+  "include": ["src/**/*.ts", "src/**/*.json", ".env", "env.d.ts"],
   "exclude": ["node_modules", "src/http", "src/logs", "src/tests"]
 }

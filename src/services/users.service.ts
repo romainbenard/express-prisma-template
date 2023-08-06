@@ -1,12 +1,11 @@
+import prisma from '@/lib/prisma'
 import { CreateUser } from '@/validations/users.validation'
-import { PrismaClient, User } from '@prisma/client'
+import { User } from '@prisma/client'
 
 class UsersService {
-  public users = new PrismaClient().user
-
   public getUsers = async (): Promise<User[]> => {
     try {
-      return await this.users.findMany()
+      return await prisma.user.findMany()
     } catch (e) {
       throw new Error(e as string)
     }
@@ -14,7 +13,7 @@ class UsersService {
 
   public getUserById = async (id: string): Promise<User | null> => {
     try {
-      return await this.users.findUnique({
+      return await prisma.user.findUnique({
         where: {
           id,
         },
@@ -26,7 +25,7 @@ class UsersService {
 
   public createUser = async (data: CreateUser): Promise<User> => {
     try {
-      return await this.users.create({
+      return await prisma.user.create({
         data,
       })
     } catch (e) {
@@ -39,7 +38,7 @@ class UsersService {
     data: Partial<User>
   ): Promise<User> => {
     try {
-      return await this.users.update({
+      return await prisma.user.update({
         where: {
           id,
         },
@@ -52,7 +51,7 @@ class UsersService {
 
   public deleteUser = async (id: string): Promise<User> => {
     try {
-      return await this.users.delete({
+      return await prisma.user.delete({
         where: {
           id,
         },

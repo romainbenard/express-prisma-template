@@ -1,11 +1,11 @@
 import config from '@/config'
 import prisma from '@/lib/prisma'
-import { DataStoredInToken, RequestWithUser } from '@/types/auth'
-import { NextFunction, Response } from 'express'
+import { DataStoredInToken } from '@/types/auth'
+import { NextFunction, Request, Response } from 'express'
 import { verify } from 'jsonwebtoken'
 
 const isAuthenticated = async (
-  req: RequestWithUser,
+  req: Request,
   res: Response<ApiResponse>,
   next: NextFunction
 ) => {

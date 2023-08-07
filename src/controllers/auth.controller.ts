@@ -1,4 +1,5 @@
 import AuthService from '@/services/auth.service'
+import { RequestWithUser } from '@/types/auth'
 import { CreateUser } from '@/validations/users.validation'
 import { Request, Response } from 'express'
 
@@ -27,7 +28,7 @@ class AuthController {
       const { authCookie } = await this.authService.logIn(req.body)
 
       res.setHeader('Set-Cookie', [authCookie])
-      return res.status(200).json({ success: true })
+      return res.status(200).json({ success: true, message: 'Logged in' })
     } catch (e) {
       return res
         .status(500)
@@ -35,9 +36,9 @@ class AuthController {
     }
   }
 
-  public logOut = async (_: Request, res: Response<ApiResponse>) => {
+  public logOut = async (req: RequestWithUser, res: Response<ApiResponse>) => {
     res.setHeader('Set-Cookie', ['Authorization=; Max-age=0'])
-    return res.status(200).json({ success: true })
+    return res.status(200).json({ success: true, message: 'Logged out' })
   }
 }
 

@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 
 import validateEnv from '@utils/validateEnv'
 import usersRouter from './routers/user.routes'
+import authRouter from './routers/auth.routes'
 
 dotenv.config()
 
@@ -18,6 +19,7 @@ app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
 
+app.use('/auth', authRouter)
 app.use('/users', usersRouter)
 
 app.use('*', (_, res) => {

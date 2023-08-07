@@ -1,22 +1,10 @@
 import config from '@/config'
 import prisma from '@/lib/prisma'
 import { DataStoredInToken, TokenData } from '@/types/auth'
-import { CreateUser, Login } from '@/validations/users.validation'
+import { CreateUser, LoginUser } from '@/validations/users.validation'
 import { User } from '@prisma/client'
 import { compare, hash } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
-
-// signUp
-// Find if a users exist
-
-// logIn
-// Find by user email exist
-// FAILED => return generic error
-// SUCCESS => check password
-// FAILED => return generic error
-// SUCCESS => create jwt token
-
-//logOut
 
 class AuthService {
   async signUp(data: CreateUser): Promise<User> {
@@ -35,7 +23,7 @@ class AuthService {
     return createdUser
   }
 
-  async logIn(data: Login): Promise<{ authCookie: string }> {
+  async logIn(data: LoginUser): Promise<{ authCookie: string }> {
     const { email, password } = data
 
     const findUser = await prisma.user.findUnique({

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import UsersService from '@/services/users.service'
 import { User } from '@prisma/client'
-import { CreateUser, UpdateUser } from '@/validations/users.validation'
+import { UpdateUser } from '@/validations/users.validation'
 
 class UsersController {
   public usersService = new UsersService()
@@ -31,21 +31,6 @@ class UsersController {
       return res
         .status(500)
         .json({ success: false, message: 'An error occurred' })
-    }
-  }
-
-  public createUser = async (
-    req: Request<{ id: string }, any, CreateUser>,
-    res: Response<ApiResponse<User>>
-  ) => {
-    try {
-      const user: User = await this.usersService.createUser(req.body)
-
-      return res.status(201).json({ success: true, data: user })
-    } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'User creation failed' })
     }
   }
 

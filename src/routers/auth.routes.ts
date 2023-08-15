@@ -1,11 +1,12 @@
-import AuthController from '@/controllers/auth.controller'
-import isAuthenticated from '@/middlewares/isAuthenticated.middleware'
-import { validateBody } from '@/middlewares/validate.middleware'
+import AuthController from '../controllers/auth.controller'
+
+import { Router } from 'express'
 import {
   createUserValidation,
   loginValidation,
-} from '@/validations/users.validation'
-import { Router } from 'express'
+} from '../validations/users.validation'
+import { validateBody } from '../middlewares/validate.middleware'
+import isAuthenticated from '../middlewares/isAuthenticated.middleware'
 
 const authRouter = Router()
 const { signUp, logIn, logOut } = new AuthController()

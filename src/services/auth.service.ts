@@ -1,11 +1,11 @@
-import config from '@/config'
-import prisma from '@/lib/prisma'
-import { DataStoredInToken, TokenData } from '@/types/auth'
-import HttpError from '@/utils/httpError'
-import { CreateUser, LoginUser } from '@/validations/users.validation'
-import { User } from '@prisma/client'
 import { compare, hash } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
+import { User } from '@prisma/client'
+import { CreateUser, LoginUser } from '../validations/users.validation'
+import prisma from '../lib/prisma'
+import HttpError from '../utils/httpError'
+import { DataStoredInToken, TokenData } from '../types/auth'
+import config from '../config'
 
 class AuthService {
   async signUp(data: CreateUser): Promise<User> {

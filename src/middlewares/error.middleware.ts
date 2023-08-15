@@ -1,6 +1,6 @@
-import { logger } from '@/lib/logger'
-import HttpError from '@/utils/httpError'
 import { NextFunction, Request, Response } from 'express'
+import HttpError from '../utils/httpError'
+import { logger } from '../lib/logger'
 
 export const errorMiddleware = (
   err: HttpError,

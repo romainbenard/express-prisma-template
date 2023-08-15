@@ -1,9 +1,9 @@
-import config from '@/config'
-import prisma from '@/lib/prisma'
-import { DataStoredInToken } from '@/types/auth'
-import HttpError from '@/utils/httpError'
 import { NextFunction, Request, Response } from 'express'
 import { verify } from 'jsonwebtoken'
+import HttpError from '../utils/httpError'
+import config from '../config'
+import { DataStoredInToken } from '../types/auth'
+import prisma from '../lib/prisma'
 
 const isAuthenticated = async (
   req: Request,

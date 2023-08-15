@@ -3,11 +3,11 @@ import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 
-import validateEnv from '@utils/validateEnv'
-import usersRouter from './routers/user.routes'
 import authRouter from './routers/auth.routes'
-import errorMiddleware from './middlewares/error.middleware'
+import usersRouter from './routers/user.routes'
 import httpLogger from './lib/logger'
+import validateEnv from './utils/validateEnv'
+import errorMiddleware from './middlewares/error.middleware'
 
 validateEnv()
 

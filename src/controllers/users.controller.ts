@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
-import UsersService from '@/services/users.service'
 import { User } from '@prisma/client'
-import { UpdateUser } from '@/validations/users.validation'
-import HttpError from '@/utils/httpError'
+import UsersService from '../services/users.service'
+import HttpError from '../utils/httpError'
+import { UpdateUser } from '../validations/users.validation'
 
 class UsersController {
   public usersService = new UsersService()
 
-  public getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  public getUsers = async (_: Request, res: Response, next: NextFunction) => {
     try {
       const users = await this.usersService.getUsers()
 

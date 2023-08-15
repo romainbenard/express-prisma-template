@@ -1,6 +1,6 @@
-import prisma from '@/lib/prisma'
-import HttpError from '@/utils/httpError'
 import { User } from '@prisma/client'
+import prisma from '../lib/prisma'
+import HttpError from '../utils/httpError'
 
 class UsersService {
   public getUsers = async (): Promise<User[]> => {

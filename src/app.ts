@@ -8,6 +8,7 @@ import validateEnv from '@utils/validateEnv'
 import usersRouter from './routers/user.routes'
 import authRouter from './routers/auth.routes'
 import errorMiddleware from './middlewares/error.middleware'
+import httpLogger from './lib/logger'
 
 dotenv.config()
 
@@ -15,6 +16,7 @@ validateEnv()
 
 const app = express()
 
+app.use(httpLogger)
 app.use(helmet())
 app.use(cors())
 app.use(express.json())

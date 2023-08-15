@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger'
 import HttpError from '@/utils/httpError'
 import { NextFunction, Request, Response } from 'express'
 
@@ -17,6 +18,7 @@ export const errorMiddleware = (
 
   const { success, message } = errorObj
 
+  logger.error(errorObj)
   return res.status(errorObj.status).json({ success, message })
 }
 

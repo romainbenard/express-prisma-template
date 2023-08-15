@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -9,8 +8,6 @@ import usersRouter from './routers/user.routes'
 import authRouter from './routers/auth.routes'
 import errorMiddleware from './middlewares/error.middleware'
 import httpLogger from './lib/logger'
-
-dotenv.config()
 
 validateEnv()
 

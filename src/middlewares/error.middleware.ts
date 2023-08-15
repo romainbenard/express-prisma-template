@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import HttpError from '@/utils/httpError'
 import { NextFunction, Request, Response } from 'express'
 

@@ -24,16 +24,21 @@ class AuthController {
     next: NextFunction
   ) => {
     try {
-      const { authCookie } = await this.authService.logIn(req.body)
-
+      const { authCookie, user } = await this.authService.logIn(req.body)
+      const { email, id, name } = user
       res.setHeader('Set-Cookie', [authCookie])
-      return res.status(200).json({ success: true, message: 'Logged in' })
+
+      return res.status(200).json({
+        success: true,
+        message: 'Logged in',
+        data: { email, id, name },
+      })
     } catch (e) {
       return next(e)
     }
   }
 
-  public logOut = async (req: Request, res: Response<ApiResponse>) => {
+  public logOut = async (_: Request, res: Response<ApiResponse>) => {
     res.setHeader('Set-Cookie', ['Authorization=; Max-age=0'])
     return res.status(200).json({ success: true, message: 'Logged out' })
   }

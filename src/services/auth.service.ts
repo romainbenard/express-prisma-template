@@ -24,23 +24,23 @@ class AuthService {
     return createdUser
   }
 
-  async logIn(data: LoginUser): Promise<{ authCookie: string }> {
+  async logIn(data: LoginUser): Promise<{ authCookie: string; user: User }> {
     const { email, password } = data
 
-    const findUser = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     })
 
-    if (!findUser) throw new HttpError(404, 'Authentication failed')
+    if (!user) throw new HttpError(404, 'Authentication failed')
 
-    const isPasswordValid = await compare(password, findUser.password)
+    const isPasswordValid = await compare(password, user.password)
 
     if (!isPasswordValid) throw new HttpError(401, 'Authentication failed')
 
-    const tokenData = this.#createToken(findUser.id)
+    const tokenData = this.#createToken(user.id)
     const authCookie = this.#createCookie(tokenData)
 
-    return { authCookie }
+    return { authCookie, user }
   }
 
   #createToken(userId: string): TokenData {

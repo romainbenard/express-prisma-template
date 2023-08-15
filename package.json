@@ -1,5 +1,5 @@
 {
-  "name": "toc-app-server",
+  "name": "express-prisma-template",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

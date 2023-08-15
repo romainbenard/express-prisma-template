@@ -2,11 +2,12 @@ import { NextFunction, Request, Response } from 'express'
 import UsersService from '@/services/users.service'
 import { User } from '@prisma/client'
 import { UpdateUser } from '@/validations/users.validation'
+import HttpError from '@/utils/httpError'
 
 class UsersController {
   public usersService = new UsersService()
 
-  public getUsers = async (_: Request, res: Response, next: NextFunction) => {
+  public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const users = await this.usersService.getUsers()
 
@@ -22,6 +23,11 @@ class UsersController {
     next: NextFunction
   ) => {
     const { id } = req.params
+
+    if (req.currentUser?.id !== req.params.id) {
+      return next(new HttpError(403, '#getUserById: Not allowed'))
+    }
+
     try {
       const user = await this.usersService.getUserById(id)
 
@@ -38,6 +44,10 @@ class UsersController {
   ) => {
     const { body, params } = req
 
+    if (req.currentUser?.id !== req.params.id) {
+      return next(new HttpError(403, '#updateUser: Not allowed'))
+    }
+
     try {
       const updatedUser = await this.usersService.updateUser(params.id, body)
 
@@ -52,6 +62,10 @@ class UsersController {
     res: Response<ApiResponse>,
     next: NextFunction
   ) => {
+    if (req.currentUser?.id !== req.params.id) {
+      return next(new HttpError(403, '#deleteUser: Not allowed'))
+    }
+
     try {
       const { id } = req.params
       await this.usersService.deleteUser(id)

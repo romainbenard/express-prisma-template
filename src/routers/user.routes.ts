@@ -9,10 +9,15 @@ const { getUsers, getUserById, updateUser, deleteUser } = new UsersController()
 
 usersRouter.get('/', isAuthenticated, getUsers)
 
-usersRouter.get('/:id', getUserById)
+usersRouter.get('/:id', isAuthenticated, getUserById)
 
-usersRouter.put('/:id', validateBody(updateUserValidation), updateUser)
+usersRouter.put(
+  '/:id',
+  validateBody(updateUserValidation),
+  isAuthenticated,
+  updateUser
+)
 
-usersRouter.delete('/:id', deleteUser)
+usersRouter.delete('/:id', isAuthenticated, deleteUser)
 
 export default usersRouter

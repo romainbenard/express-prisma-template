@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma'
-import { CreateUser } from '@/validations/users.validation'
+import HttpError from '@/utils/httpError'
 import { User } from '@prisma/client'
 
 class UsersService {
@@ -7,7 +7,7 @@ class UsersService {
     try {
       return await prisma.user.findMany()
     } catch (e) {
-      throw new Error(e as string)
+      throw new HttpError(500, 'Get users failed')
     }
   }
 
@@ -19,17 +19,7 @@ class UsersService {
         },
       })
     } catch (e) {
-      throw new Error(e as string)
-    }
-  }
-
-  public createUser = async (data: CreateUser): Promise<User> => {
-    try {
-      return await prisma.user.create({
-        data,
-      })
-    } catch (e) {
-      throw new Error(e as string)
+      throw new HttpError(500, 'Get user failed')
     }
   }
 
@@ -45,7 +35,7 @@ class UsersService {
         data,
       })
     } catch (e) {
-      throw new Error(e as string)
+      throw new HttpError(500, 'User update failed')
     }
   }
 
@@ -57,7 +47,7 @@ class UsersService {
         },
       })
     } catch (e) {
-      throw new Error(e as string)
+      throw new HttpError(500, 'User deletion failed')
     }
   }
 }

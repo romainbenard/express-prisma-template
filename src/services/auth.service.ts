@@ -1,6 +1,7 @@
 import config from '@/config'
 import prisma from '@/lib/prisma'
 import { DataStoredInToken, TokenData } from '@/types/auth'
+import HttpError from '@/utils/httpError'
 import { CreateUser, LoginUser } from '@/validations/users.validation'
 import { User } from '@prisma/client'
 import { compare, hash } from 'bcrypt'
@@ -13,7 +14,7 @@ class AuthService {
       where: { email },
     })
 
-    if (findUser) throw new Error('User already exist')
+    if (findUser) throw new HttpError(401, 'User already exists')
 
     const hashedPassword = await hash(password, 10)
     const createdUser = await prisma.user.create({
@@ -30,11 +31,11 @@ class AuthService {
       where: { email },
     })
 
-    if (!findUser) throw new Error('No user found')
+    if (!findUser) throw new HttpError(404, 'Authentication failed')
 
     const isPasswordValid = await compare(password, findUser.password)
 
-    if (!isPasswordValid) throw new Error('Invalid password')
+    if (!isPasswordValid) throw new HttpError(401, 'Authentication failed')
 
     const tokenData = this.#createToken(findUser.id)
     const authCookie = this.#createCookie(tokenData)

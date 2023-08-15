@@ -1,27 +1,27 @@
 import AuthService from '@/services/auth.service'
 import { CreateUser } from '@/validations/users.validation'
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 class AuthController {
   public authService = new AuthService()
 
   public signUp = async (
     req: Request<any, any, CreateUser>,
-    res: Response<ApiResponse>
+    res: Response<ApiResponse>,
+    next: NextFunction
   ) => {
     try {
       await this.authService.signUp(req.body)
 
       return res.status(200).json({ success: true })
     } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'An error occurred' })
+      return next(e)
     }
   }
   public logIn = async (
     req: Request<any, any, CreateUser>,
-    res: Response<ApiResponse>
+    res: Response<ApiResponse>,
+    next: NextFunction
   ) => {
     try {
       const { authCookie } = await this.authService.logIn(req.body)
@@ -29,9 +29,7 @@ class AuthController {
       res.setHeader('Set-Cookie', [authCookie])
       return res.status(200).json({ success: true, message: 'Logged in' })
     } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'An error occurred' })
+      return next(e)
     }
   }
 

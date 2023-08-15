@@ -1,6 +1,6 @@
 import UsersController from '@/controllers/users.controller'
-import isAuthenticated from '@/middlewares/isAuthenticated'
-import { validateBody } from '@/middlewares/validate'
+import isAuthenticated from '@/middlewares/isAuthenticated.middleware'
+import { validateBody } from '@/middlewares/validate.middleware'
 import { updateUserValidation } from '@/validations/users.validation'
 import { Router } from 'express'
 

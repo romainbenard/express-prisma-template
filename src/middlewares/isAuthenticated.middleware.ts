@@ -1,6 +1,7 @@
 import config from '@/config'
 import prisma from '@/lib/prisma'
 import { DataStoredInToken } from '@/types/auth'
+import HttpError from '@/utils/httpError'
 import { NextFunction, Request, Response } from 'express'
 import { verify } from 'jsonwebtoken'
 
@@ -17,8 +18,11 @@ const isAuthenticated = async (
       req.header('Authorization')?.split('Bearer ')[1] ||
       null
 
-    if (!Authorization)
-      return res.status(401).json({ success: false, message: 'Not allowed' })
+    if (!Authorization) {
+      const error = new HttpError(401, 'Not allowed')
+
+      return next(error)
+    }
 
     const { id: userId } = (await verify(
       Authorization,
@@ -27,19 +31,18 @@ const isAuthenticated = async (
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
 
-    if (!user)
-      return res
-        .status(401)
-        .json({ success: false, message: 'Wrong authentication token' })
+    if (!user) {
+      const error = new HttpError(401, 'Wrong authentication token')
+
+      return next(error)
+    }
 
     const { id, email, name } = user
     req.currentUser = { id, email, name }
 
     next()
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ success: false, message: 'Authentication failed' })
+  } catch (err) {
+    return next(err)
   }
 }
 

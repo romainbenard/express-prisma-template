@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import UsersService from '@/services/users.service'
 import { User } from '@prisma/client'
 import { UpdateUser } from '@/validations/users.validation'
@@ -6,21 +6,20 @@ import { UpdateUser } from '@/validations/users.validation'
 class UsersController {
   public usersService = new UsersService()
 
-  public getUsers = async (_: Request, res: Response) => {
+  public getUsers = async (_: Request, res: Response, next: NextFunction) => {
     try {
       const users = await this.usersService.getUsers()
 
       res.status(200).json({ success: true, data: users })
     } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'An error occurred' })
+      return next(e)
     }
   }
 
   public getUserById = async (
     req: Request<{ id: string }>,
-    res: Response<ApiResponse<User | null>>
+    res: Response<ApiResponse<User | null>>,
+    next: NextFunction
   ) => {
     const { id } = req.params
     try {
@@ -28,15 +27,14 @@ class UsersController {
 
       res.status(200).json({ success: true, data: user })
     } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'An error occurred' })
+      return next(e)
     }
   }
 
   public updateUser = async (
     req: Request<{ id: string }, any, UpdateUser>,
-    res: Response<ApiResponse<User>>
+    res: Response<ApiResponse<User>>,
+    next: NextFunction
   ) => {
     const { body, params } = req
 
@@ -45,15 +43,14 @@ class UsersController {
 
       res.status(200).json({ success: true, data: updatedUser })
     } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'User update failed' })
+      return next(e)
     }
   }
 
   public deleteUser = async (
     req: Request<{ id: string }>,
-    res: Response<ApiResponse>
+    res: Response<ApiResponse>,
+    next: NextFunction
   ) => {
     try {
       const { id } = req.params
@@ -61,9 +58,7 @@ class UsersController {
 
       res.status(200).json({ success: true })
     } catch (e) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'User deletion failed' })
+      return next(e)
     }
   }
 }

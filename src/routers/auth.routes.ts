@@ -1,6 +1,6 @@
 import AuthController from '@/controllers/auth.controller'
-import isAuthenticated from '@/middlewares/isAuthenticated'
-import { validateBody } from '@/middlewares/validate'
+import isAuthenticated from '@/middlewares/isAuthenticated.middleware'
+import { validateBody } from '@/middlewares/validate.middleware'
 import {
   createUserValidation,
   loginValidation,

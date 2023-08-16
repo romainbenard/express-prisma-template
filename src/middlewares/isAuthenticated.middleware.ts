@@ -7,7 +7,7 @@ import prisma from '../lib/prisma'
 
 const isAuthenticated = async (
   req: Request,
-  res: Response<ApiResponse>,
+  _: Response<ApiResponse>,
   next: NextFunction
 ) => {
   const { secretKey } = config

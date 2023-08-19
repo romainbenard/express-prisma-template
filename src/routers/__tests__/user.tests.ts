@@ -7,6 +7,7 @@ import {
   userThreeFixture,
   userTwoFixture,
 } from '../__fixtures__/userFixtures'
+import createUserAndLogin from '../../utils/test/createUserAndLogin'
 
 describe('src/routers/user.routes.ts', () => {
   beforeEach(async () => {
@@ -14,7 +15,7 @@ describe('src/routers/user.routes.ts', () => {
     jest.clearAllMocks()
   })
 
-  describe('/', () => {
+  describe('/users', () => {
     it('should return an error status if request failed', async () => {
       jest.spyOn(prisma.user, 'findMany').mockRejectedValueOnce(null)
 
@@ -62,6 +63,49 @@ describe('src/routers/user.routes.ts', () => {
           },
         ],
       })
+    })
+  })
+
+  describe('/users/:id', () => {
+    it('should return 401 if user is not authentified', async () => {
+      const res = await supertest(app).get('/users/2')
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should not allowed access if other user try to access data of other user', async () => {
+      const token = await createUserAndLogin(
+        'userOne@test.co',
+        'azerty',
+        'John',
+        '1'
+      )
+
+      const res = await supertest(app)
+        .get('/users/2')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should return the expected user', async () => {
+      const token = await createUserAndLogin(
+        'user@test.co',
+        'azerty',
+        'John',
+        '3'
+      )
+
+      const res = await supertest(app)
+        .get('/users/3')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res.status).toBe(200)
+
+      expect(res.body).toHaveProperty('success', true)
+      expect(res.body.data).toHaveProperty('id', '3')
+      expect(res.body.data).toHaveProperty('email', 'user@test.co')
+      expect(res.body.data).toHaveProperty('name', 'John')
     })
   })
 })

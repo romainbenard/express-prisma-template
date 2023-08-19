@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const createUserValidation = z.object({
-  email: z.string(),
+  email: z.string().email(),
   name: z.string(),
   password: z.string(),
 })
@@ -9,7 +9,7 @@ export const createUserValidation = z.object({
 export const updateUserValidation = createUserValidation.partial()
 
 export const loginValidation = z.object({
-  email: z.string(),
+  email: z.string().email(),
   password: z.string(),
 })
 

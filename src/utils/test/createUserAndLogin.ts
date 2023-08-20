@@ -3,13 +3,21 @@ import prisma from '../../lib/prisma'
 import supertest from 'supertest'
 import app from '../../app'
 
-const createUserAndLogin = async (
-  email: string,
-  password: string,
-  name?: string,
+type LoginTestUser = {
+  email: string
+  password?: string
+  name?: string
   id?: string
-) => {
-  const passwordFixture = await hash(password, 10)
+}
+
+const createUserAndLogin = async ({
+  email,
+  password,
+  name,
+  id,
+}: LoginTestUser) => {
+  const pwd = password || 'azerty'
+  const passwordFixture = await hash(pwd, 10)
 
   await prisma.user.create({
     data: {
@@ -22,7 +30,7 @@ const createUserAndLogin = async (
 
   const login = await supertest(app)
     .post('/auth/login')
-    .send({ email, password })
+    .send({ email, password: pwd })
 
   const token: string = login.headers['set-cookie'][0]
     .split(';')[0]

@@ -49,9 +49,9 @@ describe('src/routers/user.routes.ts', () => {
       expect(res.body).toMatchObject({
         success: true,
         data: [
-          { email: 'userOne@test.co', name: 'User One', password: 'azerty' },
-          { email: 'userTwo@test.co', name: 'User Two', password: '12345' },
-          { email: 'userThree@test.co', name: 'User Three', password: 'abcd' },
+          { email: 'userOne@user.co', name: 'User One', password: 'azerty' },
+          { email: 'userTwo@user.co', name: 'User Two', password: '12345' },
+          { email: 'userThree@user.co', name: 'User Three', password: 'abcd' },
         ],
       })
     })
@@ -59,7 +59,7 @@ describe('src/routers/user.routes.ts', () => {
 
   describe('GET /users/:id', () => {
     it('should return 401 if user is not authentified', async () => {
-      const res = await supertest(app).get('/users/2')
+      const res = await supertest(app).get('/users/testId')
 
       expect(res.status).toBe(401)
     })
@@ -67,18 +67,16 @@ describe('src/routers/user.routes.ts', () => {
     it('should not allowed access if other user try to access data of other user', async () => {
       await prisma.user.createMany({
         data: [
-          { email: 'user-bob@test.co', name: 'Bob', password: 'azerty' },
-          { email: 'user-alice@test.co', name: 'Alice', password: '12345' },
+          { email: 'user-bob@user.co', name: 'Bob', password: 'azerty' },
+          { email: 'user-alice@user.co', name: 'Alice', password: '12345' },
         ],
       })
 
-      const Id = '111'
-      const token = await createUserAndLogin(
-        'user-john@test.co',
-        'azerty',
-        'John',
-        Id
-      )
+      const id = '111'
+      const token = await createUserAndLogin({
+        id,
+        email: 'user-john@user.co',
+      })
 
       const res = await supertest(app)
         .get(`/users/1`)
@@ -88,24 +86,126 @@ describe('src/routers/user.routes.ts', () => {
     })
 
     it('should return the expected user', async () => {
-      const Id = '222'
-      const token = await createUserAndLogin(
-        'user-patrick@test.co',
-        'azerty',
-        'Patrick',
-        Id
-      )
+      const id = '222'
+      const token = await createUserAndLogin({
+        id,
+        email: 'user-patrick@user.co',
+        name: 'Patrick',
+      })
 
       const res = await supertest(app)
-        .get(`/users/${Id}`)
+        .get(`/users/${id}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res.status).toBe(200)
 
       expect(res.body).toHaveProperty('success', true)
       expect(res.body.data).toHaveProperty('id', '222')
-      expect(res.body.data).toHaveProperty('email', 'user-patrick@test.co')
+      expect(res.body.data).toHaveProperty('email', 'user-patrick@user.co')
       expect(res.body.data).toHaveProperty('name', 'Patrick')
+    })
+  })
+
+  describe('PUT /users/:id', () => {
+    it('should return 400 if body is not valid', async () => {
+      const id = 'update-1'
+
+      const res = await supertest(app)
+        .put(`/users/${id}`)
+        .send({ email: 'test' })
+
+      expect(res.status).toBe(400)
+    })
+
+    it('should return 401 if user is not authentified', async () => {
+      const res = await supertest(app).put('/users/testId')
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return 403 if user has no right to update the expected user', async () => {
+      const id = 'update-1'
+
+      await prisma.user.create({
+        data: {
+          id,
+          email: 'update-1@user.co',
+          name: 'Bob',
+          password: 'azerty',
+        },
+      })
+
+      const token = await createUserAndLogin({ email: 'update-2@user.co' })
+
+      const res = await supertest(app)
+        .put(`/users/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Andrew' })
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should return the update user', async () => {
+      const id = 'update-3'
+      const token = await createUserAndLogin({
+        id,
+        email: 'update-3@user.co',
+        name: 'Patrick',
+      })
+
+      const res = await supertest(app)
+        .put(`/users/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Andrew' })
+
+      expect(res.status).toBe(200)
+
+      expect(res.body).toHaveProperty('success', true)
+      expect(res.body.data).toHaveProperty('name', 'Andrew')
+    })
+  })
+
+  describe('DELETE /users/:id', () => {
+    it('should return 401 if user is not authentified', async () => {
+      const res = await supertest(app).delete('/users/testId')
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return 403 if user has no right to delete the expected user', async () => {
+      const id = 'delete-1'
+
+      await prisma.user.create({
+        data: {
+          id,
+          email: 'delete-1@user.co',
+          name: 'Bob',
+          password: 'azerty',
+        },
+      })
+
+      const token = await createUserAndLogin({ email: 'delete-2@user.co' })
+
+      const res = await supertest(app)
+        .delete(`/users/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should delete the user', async () => {
+      const id = 'delete-3'
+
+      const token = await createUserAndLogin({ email: 'delete-3@user.co', id })
+
+      const res = await supertest(app)
+        .delete(`/users/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      const user = await prisma.user.findFirst({ where: { id } })
+
+      expect(res.status).toBe(200)
+      expect(user).toBe(null)
     })
   })
 })

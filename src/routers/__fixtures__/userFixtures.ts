@@ -1,17 +1,17 @@
 export const userOneFixture = {
-  email: 'userOne@test.co',
+  email: 'userOne@user.co',
   name: 'User One',
   password: 'azerty',
 }
 
 export const userTwoFixture = {
-  email: 'userTwo@test.co',
+  email: 'userTwo@user.co',
   name: 'User Two',
   password: '12345',
 }
 
 export const userThreeFixture = {
-  email: 'userThree@test.co',
+  email: 'userThree@user.co',
   name: 'User Three',
   password: 'abcd',
 }

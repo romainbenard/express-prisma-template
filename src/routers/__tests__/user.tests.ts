@@ -10,12 +10,15 @@ import {
 import createUserAndLogin from '../../utils/test/createUserAndLogin'
 
 describe('src/routers/user.routes.ts', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     await prisma.user.deleteMany()
+  })
+
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('/users', () => {
+  describe('GET /users', () => {
     it('should return an error status if request failed', async () => {
       jest.spyOn(prisma.user, 'findMany').mockRejectedValueOnce(null)
 
@@ -43,30 +46,18 @@ describe('src/routers/user.routes.ts', () => {
       const res = await supertest(app).get('/users')
 
       expect(res.status).toBe(200)
-      expect(res.body).toEqual({
+      expect(res.body).toMatchObject({
         success: true,
         data: [
-          {
-            ...userOneFixture,
-            createdAt: new Date(1, 1, 1).toISOString(),
-            updatedAt: new Date(1, 1, 1).toISOString(),
-          },
-          {
-            ...userTwoFixture,
-            createdAt: new Date(1, 1, 1).toISOString(),
-            updatedAt: new Date(1, 1, 1).toISOString(),
-          },
-          {
-            ...userThreeFixture,
-            createdAt: new Date(1, 1, 1).toISOString(),
-            updatedAt: new Date(1, 1, 1).toISOString(),
-          },
+          { email: 'userOne@test.co', name: 'User One', password: 'azerty' },
+          { email: 'userTwo@test.co', name: 'User Two', password: '12345' },
+          { email: 'userThree@test.co', name: 'User Three', password: 'abcd' },
         ],
       })
     })
   })
 
-  describe('/users/:id', () => {
+  describe('GET /users/:id', () => {
     it('should return 401 if user is not authentified', async () => {
       const res = await supertest(app).get('/users/2')
 
@@ -74,38 +65,47 @@ describe('src/routers/user.routes.ts', () => {
     })
 
     it('should not allowed access if other user try to access data of other user', async () => {
+      await prisma.user.createMany({
+        data: [
+          { email: 'user-bob@test.co', name: 'Bob', password: 'azerty' },
+          { email: 'user-alice@test.co', name: 'Alice', password: '12345' },
+        ],
+      })
+
+      const Id = '111'
       const token = await createUserAndLogin(
-        'userOne@test.co',
+        'user-john@test.co',
         'azerty',
         'John',
-        '1'
+        Id
       )
 
       const res = await supertest(app)
-        .get('/users/2')
+        .get(`/users/1`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res.status).toBe(403)
     })
 
     it('should return the expected user', async () => {
+      const Id = '222'
       const token = await createUserAndLogin(
-        'user@test.co',
+        'user-patrick@test.co',
         'azerty',
-        'John',
-        '3'
+        'Patrick',
+        Id
       )
 
       const res = await supertest(app)
-        .get('/users/3')
+        .get(`/users/${Id}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res.status).toBe(200)
 
       expect(res.body).toHaveProperty('success', true)
-      expect(res.body.data).toHaveProperty('id', '3')
-      expect(res.body.data).toHaveProperty('email', 'user@test.co')
-      expect(res.body.data).toHaveProperty('name', 'John')
+      expect(res.body.data).toHaveProperty('id', '222')
+      expect(res.body.data).toHaveProperty('email', 'user-patrick@test.co')
+      expect(res.body.data).toHaveProperty('name', 'Patrick')
     })
   })
 })

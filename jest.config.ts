@@ -5,6 +5,11 @@ dotenv.config({ path: '.env.test' })
 
 export default async (): Promise<Config> => {
   return {
+    globals: {
+      'ts-jest': {
+        isolatedModules: true,
+      },
+    },
     verbose: true,
     testEnvironment: 'node',
     coveragePathIgnorePatterns: ['/node_modules/'],

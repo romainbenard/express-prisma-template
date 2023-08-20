@@ -10,7 +10,7 @@
     "migrate:reset": "npx prisma migrate reset --force",
     "pretest": "dotenv -e .env.test npm run migrate:reset",
     "test": "jest",
-    "test:watch": "npm run pretest && jest --watch",
+    "test:watch": "npm run pretest && jest --watch -i",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"

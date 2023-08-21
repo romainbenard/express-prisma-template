@@ -5,14 +5,14 @@ import prisma from '../../lib/prisma'
 import { hash } from 'bcrypt'
 
 describe('src/routers/auth.routes.ts', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     await prisma.user.deleteMany()
   })
 
   describe('/signup', () => {
     it('should failed if a body request is not valid', async () => {
       const res = await supertest(app).post('/auth/signup').send({
-        email: 'test@test.co',
+        email: 'signup-1@test.co',
         name: 'userTest',
       })
 
@@ -21,11 +21,15 @@ describe('src/routers/auth.routes.ts', () => {
 
     it('should failed if a user already exist', async () => {
       await prisma.user.create({
-        data: { email: 'test@test.co', name: 'userTest', password: 'azerty' },
+        data: {
+          email: 'signup-2@test.co',
+          name: 'userTest',
+          password: 'azerty',
+        },
       })
 
       const res = await supertest(app).post('/auth/signup').send({
-        email: 'test@test.co',
+        email: 'signup-2@test.co',
         name: 'userTest',
         password: 'azerty',
       })
@@ -35,7 +39,7 @@ describe('src/routers/auth.routes.ts', () => {
 
     it('should succeed when a new user create an account', async () => {
       const res = await supertest(app).post('/auth/signup').send({
-        email: 'test@test.co',
+        email: 'signup-3@test.co',
         name: 'userTest',
         password: 'azerty',
       })
@@ -47,14 +51,14 @@ describe('src/routers/auth.routes.ts', () => {
   describe('/login', () => {
     it('should failed if body request is not valid', async () => {
       const res = await supertest(app).post('/auth/login').send({
-        email: 'login@test.co',
+        email: 'login-1@test.co',
       })
       expect(res.status).toBe(400)
     })
 
     it('should failed if user not exist', async () => {
       const res = await supertest(app).post('/auth/login').send({
-        email: 'unknown@test.co',
+        email: 'login-2@test.co',
         password: '12345678',
       })
 
@@ -66,14 +70,14 @@ describe('src/routers/auth.routes.ts', () => {
 
       await prisma.user.create({
         data: {
-          email: 'password@test.co',
+          email: 'login-3@test.co',
           name: 'John',
           password: passwordFixture,
         },
       })
 
       const res = await supertest(app).post('/auth/login').send({
-        email: 'password@test.co',
+        email: 'login-3@test.co',
         password: '123456',
       })
 
@@ -84,14 +88,14 @@ describe('src/routers/auth.routes.ts', () => {
       const passwordFixture = await hash('azerty', 10)
       await prisma.user.create({
         data: {
-          email: 'login@test.co',
+          email: 'login-4@test.co',
           name: 'John',
           password: passwordFixture,
         },
       })
 
       const res = await supertest(app).post('/auth/login').send({
-        email: 'login@test.co',
+        email: 'login-4@test.co',
         password: 'azerty',
       })
 
@@ -100,7 +104,7 @@ describe('src/routers/auth.routes.ts', () => {
       expect(res.body).toMatchObject({
         success: true,
         data: {
-          email: 'login@test.co',
+          email: 'login-4@test.co',
           name: 'John',
         },
       })
@@ -118,14 +122,14 @@ describe('src/routers/auth.routes.ts', () => {
       const passwordFixture = await hash('azerty', 10)
       await prisma.user.create({
         data: {
-          email: 'login@test.co',
+          email: 'logout-1@test.co',
           name: 'John',
           password: passwordFixture,
         },
       })
 
       const login = await supertest(app).post('/auth/login').send({
-        email: 'login@test.co',
+        email: 'logout-1@test.co',
         password: 'azerty',
       })
 

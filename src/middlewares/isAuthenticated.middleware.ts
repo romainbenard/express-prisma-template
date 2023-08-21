@@ -26,6 +26,7 @@ const isAuthenticated = async (
 
     const { id: userId } = verify(Authorization, secretKey) as DataStoredInToken
     const user = await prisma.user.findUnique({ where: { id: userId } })
+
     if (!user) {
       const error = new HttpError(401, 'Wrong authentication token')
 

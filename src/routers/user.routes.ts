@@ -7,7 +7,7 @@ import { validateBody } from '../middlewares/validate.middleware'
 const usersRouter = Router()
 const { getUsers, getUserById, updateUser, deleteUser } = new UsersController()
 
-usersRouter.get('/', isAuthenticated, getUsers)
+usersRouter.get('/', getUsers)
 
 usersRouter.get('/:id', isAuthenticated, getUserById)
 

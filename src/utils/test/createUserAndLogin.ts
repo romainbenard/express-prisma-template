@@ -16,7 +16,7 @@ const createUserAndLogin = async ({
   name,
   id,
 }: LoginTestUser) => {
-  const pwd = password || 'azerty'
+  const pwd = password || 'AzertY1234?'
   const passwordFixture = await hash(pwd, 10)
 
   await prisma.user.create({

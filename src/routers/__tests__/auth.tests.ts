@@ -2,18 +2,38 @@ import { describe, expect, it } from '@jest/globals'
 import app from '../../app'
 import supertest from 'supertest'
 import prisma from '../../lib/prisma'
-import { hash } from 'bcrypt'
+import * as bcrypt from 'bcrypt'
+
+const { hash } = bcrypt
+
+// https://github.com/aelbore/esbuild-jest/issues/26#issuecomment-968853688
+jest.mock('bcrypt', () => ({
+  __esModule: true,
+  ...jest.requireActual('bcrypt'),
+}))
 
 describe('src/routers/auth.routes.ts', () => {
   beforeAll(async () => {
     await prisma.user.deleteMany()
   })
 
+  const spyBcryptHash = jest.spyOn(bcrypt, 'hash')
+
   describe('/signup', () => {
     it('should failed if a body request is not valid', async () => {
       const res = await supertest(app).post('/auth/signup').send({
         email: 'signup-1@test.co',
         name: 'userTest',
+      })
+
+      expect(res.status).toBe(400)
+    })
+
+    it('should failed if password is not strong enough', async () => {
+      const res = await supertest(app).post('/auth/signup').send({
+        email: 'signup-1@test.co',
+        name: 'userTest',
+        password: '1234',
       })
 
       expect(res.status).toBe(400)
@@ -31,7 +51,7 @@ describe('src/routers/auth.routes.ts', () => {
       const res = await supertest(app).post('/auth/signup').send({
         email: 'signup-2@test.co',
         name: 'userTest',
-        password: 'azerty',
+        password: 'AzertY1234?',
       })
 
       expect(res.status).toBe(401)
@@ -41,9 +61,9 @@ describe('src/routers/auth.routes.ts', () => {
       const res = await supertest(app).post('/auth/signup').send({
         email: 'signup-3@test.co',
         name: 'userTest',
-        password: 'azerty',
+        password: 'AzertY1234?',
       })
-
+      expect(spyBcryptHash).toHaveBeenCalledTimes(1)
       expect(res.status).toBe(200)
     })
   })

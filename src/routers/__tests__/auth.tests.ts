@@ -2,12 +2,22 @@ import { describe, expect, it } from '@jest/globals'
 import app from '../../app'
 import supertest from 'supertest'
 import prisma from '../../lib/prisma'
-import { hash } from 'bcrypt'
+import * as bcrypt from 'bcrypt'
+
+const { hash } = bcrypt
+
+// https://github.com/aelbore/esbuild-jest/issues/26#issuecomment-968853688
+jest.mock('bcrypt', () => ({
+  __esModule: true,
+  ...jest.requireActual('bcrypt'),
+}))
 
 describe('src/routers/auth.routes.ts', () => {
   beforeAll(async () => {
     await prisma.user.deleteMany()
   })
+
+  const spyBcryptHash = jest.spyOn(bcrypt, 'hash')
 
   describe('/signup', () => {
     it('should failed if a body request is not valid', async () => {
@@ -53,7 +63,7 @@ describe('src/routers/auth.routes.ts', () => {
         name: 'userTest',
         password: 'AzertY1234?',
       })
-
+      expect(spyBcryptHash).toHaveBeenCalledTimes(1)
       expect(res.status).toBe(200)
     })
   })

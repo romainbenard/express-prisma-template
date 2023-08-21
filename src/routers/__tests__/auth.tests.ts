@@ -19,6 +19,16 @@ describe('src/routers/auth.routes.ts', () => {
       expect(res.status).toBe(400)
     })
 
+    it('should failed if password is not strong enough', async () => {
+      const res = await supertest(app).post('/auth/signup').send({
+        email: 'signup-1@test.co',
+        name: 'userTest',
+        password: '1234',
+      })
+
+      expect(res.status).toBe(400)
+    })
+
     it('should failed if a user already exist', async () => {
       await prisma.user.create({
         data: {
@@ -31,7 +41,7 @@ describe('src/routers/auth.routes.ts', () => {
       const res = await supertest(app).post('/auth/signup').send({
         email: 'signup-2@test.co',
         name: 'userTest',
-        password: 'azerty',
+        password: 'AzertY1234?',
       })
 
       expect(res.status).toBe(401)
@@ -41,7 +51,7 @@ describe('src/routers/auth.routes.ts', () => {
       const res = await supertest(app).post('/auth/signup').send({
         email: 'signup-3@test.co',
         name: 'userTest',
-        password: 'azerty',
+        password: 'AzertY1234?',
       })
 
       expect(res.status).toBe(200)
